@@ -1,15 +1,20 @@
 import logging
 import json
 import requests
+import os
 
+from dotenv import load_dotenv
 from datetime import date, time, timedelta
 from bs4 import BeautifulSoup
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-BOT_TOKEN = '7893481762:AAG52zMK6zhUgZE4XzaioUvshblwZNeHL74'
-URL_DARQUBE = 'https://api.darqube.com/data-api/market-data/quote/{}?token=777bd2e3b913467d8059b14ce4d1f6d2'
-# API_POLYGON = 'd0E2rYIHdAf3SmI125RDKjrCEOVZzfMh'
+load_dotenv()
+
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+URL_DARQUBE = os.environ.get('URL_DARQUBE')
+API_POLYGON = os.environ.get('API_POLYGON')
+
 HEADERS = {
     'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
 }
