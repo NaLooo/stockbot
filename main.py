@@ -21,11 +21,11 @@ HEADERS = {
 
 WATCH_LIST = {}
 
-SPY_RATIO = 6025.99 / 600.77
-ES_RATIO  = 6049.25 / 6025.99
+SPY_RATIO = 5954.50 / 594.18
+ES_RATIO  = 5963.25 / 5954.50
 
-QQQ_RATIO = 21491.31 / 522.92
-NQ_RATIO = 21588.25 / 21491.31
+QQQ_RATIO = 20884.41 / 508.17
+NQ_RATIO = 20919.5 / 20884.41
 
 LAST_UPDATED_AT = date.today()
 
@@ -38,6 +38,12 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
+
+async def error_handler(update, context):
+    logger.error("Error", exc_info=context.error)
+
+def quote_CNBC(ticker):
+    return float(BeautifulSoup(requests.get('https://www.cnbc.com/quotes/{}'.format(ticker), headers=HEADERS).text, 'lxml').find(class_='Summary-stat Summary-prevClose').find(class_="Summary-value").text.replace(',', ''))
 
 def save_list():
     file = open('watch_list.json', 'w', encoding="utf8")
@@ -70,6 +76,15 @@ def update_conversion_ratio(context):
         ndx = float(BeautifulSoup(requests.get('https://www.google.com/finance/quote/NDX:INDEXNASDAQ').text, 'lxml').find(class_='P6K39c').text.replace(',', ''))
         nq = float(BeautifulSoup(requests.get('https://www.google.com/finance/quote/NQW00:CME_EMINIS').text, 'lxml').find(class_='P6K39c').text[1:].replace(',', ''))
 
+
+        # spy = float(BeautifulSoup(requests.get('https://www.google.com/finance/quote/SPY:NYSEARCA').text, 'lxml').find(class_='P6K39c').text[1:].replace(',', ''))
+        # spx = quote_CNBC('SPX')
+        # es  = quote_CNBC('@SP.1')
+
+        # qqq = float(BeautifulSoup(requests.get('https://www.google.com/finance/quote/QQQ:NASDAQ').text, 'lxml').find(class_='P6K39c').text[1:].replace(',', ''))
+        # ndx = quote_CNBC('NDX')
+        # nq  = quote_CNBC('@ND.1')
+
         SPY_RATIO = spx / spy
         ES_RATIO = es / spx
 
@@ -85,57 +100,99 @@ def update_conversion_ratio(context):
     
 
 async def spy_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    spy = float(update.message.text.split()[1])
-    spx = spy * SPY_RATIO
-    es = spx * ES_RATIO
 
-    reply = spy_reply(spy, spx, es)
+    reply = ''
+
+    try:
+        spy = float(update.message.text.split()[1])
+        spx = spy * SPY_RATIO
+        es = spx * ES_RATIO
+
+        reply = spy_reply(spy, spx, es)
+
+    except:
+        reply = 'error'
 
     await update.message.reply_text(reply)
 
 async def spx_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    spx = float(update.message.text.split()[1])
-    spy = spx / SPY_RATIO
-    es = spx * ES_RATIO
+    
+    reply = ''
 
-    reply = spy_reply(spy, spx, es)
+    try:
+        spx = float(update.message.text.split()[1])
+        spy = spx / SPY_RATIO
+        es = spx * ES_RATIO
+
+        reply = spy_reply(spy, spx, es)
+
+    except:
+        reply = 'error'
 
     await update.message.reply_text(reply)
 
 async def es_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    es = float(update.message.text.split()[1])
-    spx = es / ES_RATIO
-    spy = spx / SPY_RATIO
 
-    reply = spy_reply(spy, spx, es)
+    reply = ''
+
+    try:
+        es = float(update.message.text.split()[1])
+        spx = es / ES_RATIO
+        spy = spx / SPY_RATIO
+
+        reply = spy_reply(spy, spx, es)
+
+    except:
+        reply = 'error'
 
     await update.message.reply_text(reply)
 
 
 async def qqq_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    qqq = float(update.message.text.split()[1])
-    ndx = qqq * QQQ_RATIO
-    nq = ndx * NQ_RATIO
+    
+    reply = ''
 
-    reply = qqq_reply(qqq, ndx, nq)
+    try:
+        qqq = float(update.message.text.split()[1])
+        ndx = qqq * QQQ_RATIO
+        nq = ndx * NQ_RATIO
+
+        reply = qqq_reply(qqq, ndx, nq)
+
+    except:
+        reply = 'error'
 
     await update.message.reply_text(reply)
 
 async def ndx_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    qqq = float(update.message.text.split()[1])
-    ndx = qqq * QQQ_RATIO
-    nq = ndx * NQ_RATIO
+    
+    reply = ''
 
-    reply = qqq_reply(qqq, ndx, nq)
+    try:
+        qqq = float(update.message.text.split()[1])
+        ndx = qqq * QQQ_RATIO
+        nq = ndx * NQ_RATIO
+
+        reply = qqq_reply(qqq, ndx, nq)
+        
+    except:
+        reply = 'error'
 
     await update.message.reply_text(reply)
 
 async def nq_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    nq = float(update.message.text.split()[1])
-    ndx = nq / NQ_RATIO
-    qqq = ndx / QQQ_RATIO
+        
+    reply = ''
 
-    reply = qqq_reply(qqq, ndx, nq)
+    try:
+        nq = float(update.message.text.split()[1])
+        ndx = nq / NQ_RATIO
+        qqq = ndx / QQQ_RATIO
+
+        reply = qqq_reply(qqq, ndx, nq)
+        
+    except:
+        reply = 'error'
 
     await update.message.reply_text(reply)
 
@@ -251,7 +308,7 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await update.message.reply_text('last updated at: ' + LAST_UPDATED_AT.strftime('%Y-%m-%d'))
 
 async def update_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    update_conversion_ratio(None)
+    # update_conversion_ratio(None)
     await update.message.reply_text('ratio updated')
 
 
@@ -259,13 +316,15 @@ def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
     application = Application.builder().token(BOT_TOKEN).build()
+    application.add_error_handler(error_handler)
 
     application.job_queue.run_daily(update_conversion_ratio, time(12, 0, 0, 0), days=(1, 2, 3, 4, 5))
 
     # application.add_handler(CommandHandler("quick_financials", quick_financials_command))
-    application.add_handler(CommandHandler("vix", vix_command))
 
     application.add_handler(CommandHandler("help", help_command))
+
+    application.add_handler(CommandHandler("vix", vix_command))
 
     application.add_handler(CommandHandler("list", list_command))
     application.add_handler(CommandHandler("add", add_command))
@@ -291,6 +350,5 @@ def main() -> None:
 if __name__ == "__main__":
 
     WATCH_LIST = json.load(open('watch_list.json', 'r', encoding="utf8"))
-    update_conversion_ratio(None)
 
     main()
